@@ -56,7 +56,7 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="/" class="nav-link">
+                            <a href="/peminjaman" class="nav-link">
                                 <i class="fas fa-book-open nav-icon text-success"></i>
                                 <p>Peminjaman Koleksi</p>
                             </a>

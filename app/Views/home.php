@@ -1,7 +1,54 @@
 <?= $this->extend('layout/page_layout') ?>
 
-<?= $this->section('content') ?>
+<?= $this->section('style') ?>
+<!-- Styles -->
+<style>
+.highcharts-figure,
+.highcharts-data-table table {
+    min-width: 100%;
+    max-width: 100%;
+    margin: 1em auto;
+}
 
+.highcharts-data-table table {
+    font-family: Verdana, sans-serif;
+    border-collapse: collapse;
+    border: 1px solid #ebebeb;
+    margin: 10px auto;
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+}
+
+.highcharts-data-table caption {
+    padding: 1em 0;
+    font-size: 1.2em;
+    color: #555;
+}
+
+.highcharts-data-table th {
+    font-weight: 600;
+    padding: 0.5em;
+}
+
+.highcharts-data-table td,
+.highcharts-data-table th,
+.highcharts-data-table caption {
+    padding: 0.5em;
+}
+
+.highcharts-data-table thead tr,
+.highcharts-data-table tr:nth-child(even) {
+    background: #f8f8f8;
+}
+
+.highcharts-data-table tr:hover {
+    background: #f1f7ff;
+}
+</style>
+<?= $this->endSection() ?>
+
+<?= $this->section('content') ?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -13,7 +60,7 @@
                 </div><!-- /.col -->
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item"><a href="<?= base_url() ?>">Home</a></li>
                         <li class="breadcrumb-item active">Dashboard</li>
                     </ol>
                 </div><!-- /.col -->
@@ -96,10 +143,10 @@
                     <!-- solid sales graph -->
                     <div class="card bg-gradient-info">
                         <div class="card-header border-0">
-                            <!-- <h3 class="card-title">
+                            <h3 class="card-title">
                                 <i class="fas fa-th mr-1"></i>
-                                Sales Graph
-                            </h3> -->
+                                Data Transaksi Pemustaka
+                            </h3>
 
                             <div class="card-tools">
                                 <button type="button" class="btn bg-info btn-sm" data-card-widget="collapse">
@@ -116,33 +163,6 @@
                             </figure>
                         </div>
                         <!-- /.card-body -->
-                        <div class="card-footer bg-transparent">
-                            <div class="row">
-                                <div class="col-4 text-center">
-                                    <input type="text" class="knob" data-readonly="true" value="20" data-width="60"
-                                        data-height="60" data-fgColor="#39CCCC">
-
-                                    <div class="text-white">Mail-Orders</div>
-                                </div>
-                                <!-- ./col -->
-                                <div class="col-4 text-center">
-                                    <input type="text" class="knob" data-readonly="true" value="50" data-width="60"
-                                        data-height="60" data-fgColor="#39CCCC">
-
-                                    <div class="text-white">Online</div>
-                                </div>
-                                <!-- ./col -->
-                                <div class="col-4 text-center">
-                                    <input type="text" class="knob" data-readonly="true" value="30" data-width="60"
-                                        data-height="60" data-fgColor="#39CCCC">
-
-                                    <div class="text-white">In-Store</div>
-                                </div>
-                                <!-- ./col -->
-                            </div>
-                            <!-- /.row -->
-                        </div>
-                        <!-- /.card-footer -->
                     </div>
                     <!-- /.card -->
                 </section>
@@ -154,5 +174,79 @@
     <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
+<?= $this->endSection() ?>
 
+<?= $this->section('script') ?>
+<!-- Highchart.js -->
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/series-label.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script>
+Highcharts.chart('container', {
+
+    title: {
+        text: 'Data Transaksi Bulanan Pemustaka'
+    },
+
+    subtitle: {
+        text: 'UPT. Perpustakaan IAIN Madura'
+    },
+
+    yAxis: {
+        title: {
+            text: 'Eksemplar'
+        }
+    },
+
+    // xAxis: {
+    //     accessibility: {
+    //         rangeDescription: 'Range: 2010 to 2017'
+    //     }
+    // },
+
+    legend: {
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle'
+    },
+
+    plotOptions: {
+        series: {
+            label: {
+                connectorAllowed: false
+            },
+            pointStart: 1
+        }
+    },
+
+    series: [{
+        name: 'Peminjaman',
+        data: [43, 25, 17, 58, 73, 93, 13, 55, 45]
+    }, {
+        name: 'Pengembalian',
+        data: [49, 40, 74, 51, 49, 38, 31, 4, 54]
+    }, {
+        name: 'Perpanjangan',
+        data: [74, 77, 5, 71, 18, 27, 37, 97, 4]
+    }],
+
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 500
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }]
+    }
+
+});
+</script>
 <?= $this->endSection() ?>

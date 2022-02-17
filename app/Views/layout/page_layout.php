@@ -4,7 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>AdminLTE 3 | Dashboard</title>
+    <link rel="icon" href="<?= base_url('dist/img/IAIN-Madura.png') ?>" type="image/x-icon">
+    <title>Layanan Mandiri | Perpustakaan IAIN Madura</title>
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet"
@@ -28,51 +29,7 @@
     <link rel="stylesheet" href="<?= base_url('plugins/daterangepicker/daterangepicker.css') ?>">
     <!-- summernote -->
     <link rel="stylesheet" href="<?= base_url('plugins/summernote/summernote-bs4.min.css') ?>">
-    <!-- Styles -->
-    <style>
-    .highcharts-figure,
-    .highcharts-data-table table {
-        min-width: 100%;
-        max-width: 100%;
-        margin: 1em auto;
-    }
-
-    .highcharts-data-table table {
-        font-family: Verdana, sans-serif;
-        border-collapse: collapse;
-        border: 1px solid #ebebeb;
-        margin: 10px auto;
-        text-align: center;
-        width: 100%;
-        max-width: 500px;
-    }
-
-    .highcharts-data-table caption {
-        padding: 1em 0;
-        font-size: 1.2em;
-        color: #555;
-    }
-
-    .highcharts-data-table th {
-        font-weight: 600;
-        padding: 0.5em;
-    }
-
-    .highcharts-data-table td,
-    .highcharts-data-table th,
-    .highcharts-data-table caption {
-        padding: 0.5em;
-    }
-
-    .highcharts-data-table thead tr,
-    .highcharts-data-table tr:nth-child(even) {
-        background: #f8f8f8;
-    }
-
-    .highcharts-data-table tr:hover {
-        background: #f1f7ff;
-    }
-    </style>
+    <?= $this->renderSection('style') ?>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed">
@@ -125,82 +82,11 @@
     <!-- AdminLTE App -->
     <script src="<?= base_url('dist/js/adminlte.js') ?>"></script>
     <!-- AdminLTE for demo purposes -->
-    <script src="<?= base_url('dist/js/demo.js') ?>"></script>
+    <!-- <script src="<?= base_url('dist/js/demo.js') ?>"></script> -->
     <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-    <script src="<?= base_url('dist/js/pages/dashboard.js') ?>"></script>
+    <!-- <script src="<?= base_url('dist/js/pages/dashboard.js') ?>"></script> -->
 
-    <!-- Highchart.js -->
-    <script src="https://code.highcharts.com/highcharts.js"></script>
-    <script src="https://code.highcharts.com/modules/series-label.js"></script>
-    <script src="https://code.highcharts.com/modules/exporting.js"></script>
-    <script src="https://code.highcharts.com/modules/export-data.js"></script>
-    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-    <script>
-    Highcharts.chart('container', {
-
-        title: {
-            text: 'Data Transaksi Bulanan Pemustaka'
-        },
-
-        subtitle: {
-            text: 'UPT. Perpustakaan IAIN Madura'
-        },
-
-        yAxis: {
-            title: {
-                text: 'Eksemplar'
-            }
-        },
-
-        // xAxis: {
-        //     accessibility: {
-        //         rangeDescription: 'Range: 2010 to 2017'
-        //     }
-        // },
-
-        legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle'
-        },
-
-        plotOptions: {
-            series: {
-                label: {
-                    connectorAllowed: false
-                },
-                pointStart: 1
-            }
-        },
-
-        series: [{
-            name: 'Peminjaman',
-            data: [43, 25, 17, 58, 73, 93, 13, 55, 45]
-        }, {
-            name: 'Pengembalian',
-            data: [49, 40, 74, 51, 49, 38, 31, 4, 54]
-        }, {
-            name: 'Perpanjangan',
-            data: [74, 77, 5, 71, 18, 27, 37, 97, 4]
-        }],
-
-        responsive: {
-            rules: [{
-                condition: {
-                    maxWidth: 500
-                },
-                chartOptions: {
-                    legend: {
-                        layout: 'horizontal',
-                        align: 'center',
-                        verticalAlign: 'bottom'
-                    }
-                }
-            }]
-        }
-
-    });
-    </script>
+    <?= $this->renderSection('script') ?>
 </body>
 
 </html>

@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use App\Models\LoanModel;
-use CodeIgniter\Exceptions\PageNotFoundException;
 
 class Page extends BaseController
 {
@@ -26,9 +25,9 @@ class Page extends BaseController
         return view('home', $data);
     }
 
-    public function contact()
+    public function peminjaman()
     {
-        echo "Contact";
+        return view('peminjaman');
     }
 
     public function faqs()
