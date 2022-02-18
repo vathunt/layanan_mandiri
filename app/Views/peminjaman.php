@@ -1,7 +1,10 @@
 <?= $this->extend('layout/page_layout') ?>
 
 <?= $this->section('style') ?>
+<!-- DataTables -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.min.css">
+<!-- SweetAlert -->
+<link rel="stylesheet" href="<?= base_url('plugins/sweetalert/sweetalert2.css') ?>" />
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
@@ -37,7 +40,8 @@
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="quickForm">
+                        <form id="formPeminjaman">
+                            <?= csrf_field(); ?>
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="barcode">Masukkan Kode Eksemplar/Barkod :</label>
@@ -45,7 +49,7 @@
                                         <input type="text" name="barcode" class="form-control" id="barcode" autofocus
                                             autocomplete="off">
                                         <div class="input-group-prepend">
-                                            <button type="submit" class="btn btn-primary">PINJAM</button>
+                                            <button type="submit" id="btnPinjam" class="btn btn-primary">PINJAM</button>
                                         </div>
                                         <!-- /btn-group -->
                                     </div>
@@ -61,7 +65,7 @@
                 <div class="col-md-8">
                     <div class="card card-success">
                         <div class="card-header">
-                            <h3 class="card-title">DataTable with default features</h3>
+                            <h3 class="card-title">Data Peminjaman Koleksi</h3>
                         </div>
                         <!-- /.card-header -->
                         <div class="card-body">
@@ -77,39 +81,9 @@
                                                     <th>Judul</th>
                                                     <th>Tanggal Pinjam</th>
                                                     <th>Tanggal Harus Kembali</th>
-                                                    <th>Aksi</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
-                                                <tr class="odd">
-                                                    <td class="dtr-control sorting_1" tabindex="0">Gecko</td>
-                                                    <td>Firefox 1.0</td>
-                                                    <td>Win 98+ / OSX.2+</td>
-                                                    <td>1.7</td>
-                                                    <td><i class="fas fa-trash-alt text-danger"></i></td>
-                                                </tr>
-                                                <tr class="even">
-                                                    <td class="dtr-control sorting_1" tabindex="0">Gecko</td>
-                                                    <td>Firefox 1.5</td>
-                                                    <td>Win 98+ / OSX.2+</td>
-                                                    <td>1.8</td>
-                                                    <td><i class="fas fa-trash-alt text-danger"></i></td>
-                                                </tr>
-                                                <tr class="odd">
-                                                    <td class="dtr-control sorting_1" tabindex="0">Gecko</td>
-                                                    <td>Firefox 2.0</td>
-                                                    <td>Win 98+ / OSX.2+</td>
-                                                    <td>1.8</td>
-                                                    <td><i class="fas fa-trash-alt text-danger"></i></td>
-                                                </tr>
-                                                <tr class="even">
-                                                    <td class="dtr-control sorting_1" tabindex="0">Gecko</td>
-                                                    <td>Firefox 3.0</td>
-                                                    <td>Win 2k+ / OSX.3+</td>
-                                                    <td>1.9</td>
-                                                    <td><i class="fas fa-trash-alt text-danger"></i></td>
-                                                </tr>
-                                            </tbody>
+                                            <tbody></tbody>
                                         </table>
                                     </div>
                                 </div>
@@ -132,15 +106,11 @@
 <!-- jquery-validation -->
 <script src="<?= base_url('plugins/jquery-validation/jquery.validate.min.js') ?>"></script>
 <script src="<?= base_url('plugins/jquery-validation/additional-methods.min.js') ?>"></script>
-<!-- Page specific script -->
+<!-- SweetAlert -->
+<script src="<?= base_url('plugins/sweetalert/sweetalert2.all.min.js') ?>"></script>
 <script>
 $(function() {
-    $.validator.setDefaults({
-        submitHandler: function() {
-            alert("Form successful submitted!");
-        }
-    });
-    $('#quickForm').validate({
+    $('#formPeminjaman').validate({
         rules: {
             barcode: {
                 required: true,
@@ -161,15 +131,73 @@ $(function() {
         },
         unhighlight: function(element, errorClass, validClass) {
             $(element).removeClass('is-invalid');
+        },
+        submitHandler: (form, e) => {
+            e.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: '/peminjaman/new',
+                data: $('#formPeminjaman').serialize(),
+                dataType: 'json',
+                success: (data) => {
+                    document.getElementById('formPeminjaman').reset();
+                    const msg = JSON.parse(JSON.stringify(data));
+                    swal.fire({
+                        title: 'Berhasil',
+                        text: msg.pesan,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        $('#myTable').DataTable().ajax.reload(null, false);
+                    });
+                },
+                error: (data) => {
+                    swal.fire({
+                        title: 'Gagal',
+                        text: 'Data Gagal Disimpan',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+            return false;
         }
     });
 });
 </script>
 
+<!-- DataTables -->
 <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
 <script>
 $(document).ready(function() {
-    $('#myTable').DataTable();
+    const site_url = "<?php echo site_url(); ?>";
+
+    let table = $('#myTable').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "order": [],
+        "ajax": {
+            "url": site_url + "/peminjaman/data",
+            "type": "POST"
+        },
+        "columns": [{
+                "data": "item_code",
+                "className": "text-center"
+            },
+            {
+                "data": "title",
+                "className": "text-center"
+            },
+            {
+                "data": "loan_date",
+                "className": "text-center"
+            },
+            {
+                "data": "due_date",
+                "className": "text-center"
+            }
+        ]
+    });
 });
 </script>
 <?= $this->endSection() ?>

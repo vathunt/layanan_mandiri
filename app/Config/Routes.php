@@ -33,6 +33,8 @@ $routes->setAutoRoute(true);
 // route since we don't have to scan directories.
 $routes->get('/', 'Page::index');
 $routes->get('/peminjaman', 'Page::peminjaman');
+$routes->add('/peminjaman/new', 'Page::proses_pinjam');
+$routes->post('/peminjaman/data', 'Page::data_peminjaman');
 $routes->get('/contact', 'Page::contact');
 $routes->get('/faqs', 'Page::faqs');
 
