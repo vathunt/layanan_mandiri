@@ -72,19 +72,21 @@
                             <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
                                 <div class="row">
                                     <div class="col-sm-12">
-                                        <table id="myTable"
-                                            class="table table-bordered table-striped dataTable dtr-inline"
-                                            aria-describedby="example1_info">
-                                            <thead>
-                                                <tr>
-                                                    <th>Kode Eksemplar</th>
-                                                    <th>Judul</th>
-                                                    <th>Tanggal Pinjam</th>
-                                                    <th>Tanggal Harus Kembali</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody></tbody>
-                                        </table>
+                                        <div class="table-responsive">
+                                            <table id="myTable"
+                                                class="table table-bordered table-striped dataTable dtr-inline"
+                                                aria-describedby="example1_info">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Kode Eksemplar</th>
+                                                        <th>Judul</th>
+                                                        <th>Tanggal Pinjam</th>
+                                                        <th>Tanggal Harus Kembali</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -143,9 +145,9 @@ $(function() {
                     document.getElementById('formPeminjaman').reset();
                     const msg = JSON.parse(JSON.stringify(data));
                     swal.fire({
-                        title: 'Berhasil',
+                        title: msg.title,
                         text: msg.pesan,
-                        icon: 'success',
+                        icon: msg.label,
                         confirmButtonText: 'OK'
                     }).then(() => {
                         $('#myTable').DataTable().ajax.reload(null, false);
@@ -154,7 +156,7 @@ $(function() {
                 error: (data) => {
                     swal.fire({
                         title: 'Gagal',
-                        text: 'Data Gagal Disimpan',
+                        text: 'Ada Kesalahan',
                         icon: 'error',
                         confirmButtonText: 'OK'
                     });
@@ -190,11 +192,13 @@ $(document).ready(function() {
             },
             {
                 "data": "loan_date",
-                "className": "text-center"
+                "className": "text-center",
+                "searchable": false
             },
             {
                 "data": "due_date",
-                "className": "text-center"
+                "className": "text-center",
+                "searchable": false
             }
         ]
     });

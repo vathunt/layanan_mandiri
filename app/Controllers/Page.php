@@ -37,6 +37,39 @@ class Page extends BaseController
         return view('peminjaman');
     }
 
+    public function checkLoanRules()
+    {
+        $is_expired = true;
+
+        $member_data = $this->db->query("SELECT m.*, mt.* FROM member AS m
+            LEFT JOIN mst_member_type AS mt ON m.member_type_id = mt.member_type_id
+            WHERE member_id='18383042121'")->getResult();
+
+        $expire_date = $member_data[0]->expire_date;
+        $is_pending = (bool)$member_data[0]->is_pending;
+        $member_type_prop = array(
+            'loan_limit' => $member_data[0]->loan_limit,
+            'loan_periode' => $member_data[0]->loan_periode,
+            'enable_reserve' => $member_data[0]->enable_reserve,
+            'reserve_limit' => $member_data[0]->reserve_limit,
+            'member_periode' => $member_data[0]->member_periode,
+            'reborrow_limit' => $member_data[0]->reborrow_limit,
+            'fine_each_day' => $member_data[0]->fine_each_day,
+            'grace_periode' => $member_data[0]->grace_periode
+        );
+
+        // is membership expired ?
+        // compare it with current date
+        $_current_date = date('Y-m-d');
+        if (strtotime($_current_date) <= strtotime($expire_date)) {
+            $is_expired = false;
+        }
+
+        if ($is_expired) {
+            return 'expired';
+        }
+    }
+
     public function proses_pinjam()
     {
         // Validasi
@@ -45,23 +78,38 @@ class Page extends BaseController
         $isDataValid = $validation->withRequest($this->request)->run();
 
         if ($isDataValid) {
-            $loan = new LoanModel();
-            $loan->insert([
-                "item_code" => $this->request->getPost('barcode'),
-                "member_id" => '18383042121',
-                "loan_date" => date('Y-m-d'),
-                "due_date" => date('Y-m-d', strtotime('+7 days')),
-                "renewed" => 0,
-                "loan_rules_id" => 1,
-                "actual" => null,
-                "is_lent" => 1,
-                "is_return" => 0,
-                "return_date" => null
-            ]);
-        }
+            $loan_rules = $this->checkLoanRules();
 
-        header('Content-Type: application/json');
-        echo json_encode(array('pesan' => 'Data berhasil disimpan'));
+            if ($loan_rules == 'expired') {
+                header('Content-Type: application/json');
+                echo json_encode(array(
+                    'label' => 'error',
+                    'title' => 'Gagal',
+                    'pesan' => 'Masa Keanggotaan Sudah Berakhir'
+                ));
+            } else {
+                $loan = new LoanModel();
+                $loan->insert([
+                    "item_code" => $this->request->getPost('barcode'),
+                    "member_id" => '18383042121',
+                    "loan_date" => date('Y-m-d'),
+                    "due_date" => date('Y-m-d', strtotime('+7 days')),
+                    "renewed" => 0,
+                    "loan_rules_id" => 1,
+                    "actual" => null,
+                    "is_lent" => 1,
+                    "is_return" => 0,
+                    "return_date" => null
+                ]);
+
+                header('Content-Type: application/json');
+                echo json_encode(array(
+                    'label' => 'success',
+                    'title' => 'Berhasil',
+                    'pesan' => 'Data berhasil disimpan'
+                ));
+            }
+        }
     }
 
     public function data_peminjaman()
@@ -84,7 +132,9 @@ class Page extends BaseController
                 JOIN member m ON l.member_id = m.member_id
                 JOIN item i ON l.item_code = i.item_code
                 JOIN biblio b ON i.biblio_id = b.biblio_id
-                WHERE m.member_id = '18383042121' AND l.is_return = 0"
+                WHERE m.member_id = '18383042121'
+                AND l.is_return = 0
+                AND (b.title LIKE '%" . $search_value . "%' OR i.item_code LIKE '%" . $search_value . "%') ORDER BY l.loan_id DESC"
             )->getResult();
 
             $data = $this->db->query(
@@ -92,8 +142,8 @@ class Page extends BaseController
                 JOIN member m ON l.member_id = m.member_id
                 JOIN item i ON l.item_code = i.item_code
                 JOIN biblio b ON i.biblio_id = b.biblio_id
-                WHERE m.member_id = '18383042121' AND l.is_return = 0 
-                limit $start, $length"
+                WHERE (m.member_id = '18383042121' AND l.is_return = 0)
+                AND (b.title LIKE '%" . $search_value . "%' OR i.item_code LIKE '%" . $search_value . "%') ORDER BY l.loan_id DESC limit $start, $length"
             )->getResult();
         } else {
             // count all data
@@ -101,14 +151,15 @@ class Page extends BaseController
             JOIN member m ON l.member_id = m.member_id
             JOIN item i ON l.item_code = i.item_code
             JOIN biblio b ON i.biblio_id = b.biblio_id
-            WHERE m.member_id = '18383042121' AND l.is_return = 0")->getResult();
+            WHERE m.member_id = '18383042121' AND l.is_return = 0
+            ORDER BY l.loan_id DESC")->getResult();
 
             // get per page data
             $data = $this->db->query("SELECT i.item_code, b.title, l.loan_date, l.due_date FROM `loan` l
             JOIN member m ON l.member_id = m.member_id
             JOIN item i ON l.item_code = i.item_code
             JOIN biblio b ON i.biblio_id = b.biblio_id
-            WHERE m.member_id = '18383042121' AND l.is_return = 0 limit $start, $length")->getResult();
+            WHERE m.member_id = '18383042121' AND l.is_return = 0 ORDER BY l.loan_id DESC limit $start, $length")->getResult();
         }
 
         $json_data = array(
